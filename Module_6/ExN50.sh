@@ -1,5 +1,13 @@
 #!/bin/bash
 
+###################################################################
+#Script Name	:ExN50.sh		                                                                                              
+#Description	:Calculates ExN50 statistic for transcriptome                                                       
+#Args:                                                                                           
+#Author	:Jennifer Gerbracht                                               
+#Email		:jennifer.gerbracht@gmx.de                                           
+###################################################################
+
 source ../config.txt
 
 ${Trinity_dir}/util/abundance_estimates_to_matrix.pl \
