@@ -42,5 +42,5 @@ fi
 
 cd transdecoder
 
-TransDecoder.LongOrfs -t Trinity_filtered.fasta
-TransDecoder.Predict -t Trinity_filtered.fasta
+TransDecoder.LongOrfs -t ${moduledir}/Trinity_filtered.fasta
+TransDecoder.Predict -t ${moduledir}/Trinity_filtered.fasta
