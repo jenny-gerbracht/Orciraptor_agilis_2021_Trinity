@@ -1,5 +1,5 @@
 # Orciraptor_agilis_2021_Trinity
-Read processing and filtering, *de novo* transcriptome assembly, differential gene expression analysis and functional annotation of *Orciraptor agilis* RNA-seq data using Trinity
+Read processing and filtering, *de novo* transcriptome assembly (Trinity), differential gene expression analysis and functional annotation of *Orciraptor agilis* RNA-seq.
 
 ## Module 1: Read processing and *de novo* transcriptome assembly of prey organism *Mougeotia* sp.
 
@@ -34,16 +34,17 @@ obtain a non-redundant .pep file, rename output to "Orciraptor_non-redundant.faa
 
 ## Module 5: Differential gene expression analysis
 1. Mapping the processed reads back to the newly generated transcriptome with bowtie2 and counting with salmon in alignment-mode (bowtie2.sh).
-2. Run DESeq2
+2. Run DESeq2 analysis and generate figures (DESeq2/DESeq2.R)
 
 ## Module 6: Assembly summary statistics
-1) number of Genes, isoforms, ORFs (status), Ex90 
+1) Number of number + length statistics of contigs was calculated with TrinityStats.pl script from Trinity toolkit
+2) Number, completeness and orientation of ORFs is summarised with transdecoder_count.sh
+3) ExN50 statistic is calculated with ExN50.sh 
 
 ## Module 8: GH5_5 phylogeny
 1. Run AssignRandomSeqnames.py on input sequences to generate random names
-2. Simplify tip labels and generate annotation file for Figtree with Renaming_and_annoration.R
-3. Run alignment and trimming ?.sh
-4. Remove identical sequences using DereplicateALN.py
-5. Find best model with IQtree_modelfind.sh
-6. Generate tree with IQtree.sh
-7. Run RenameTrees.py to get tip labels
+2. Simplify tip labels and generate annotation file for FigTree with Renaming_and_annotation.R
+3. Run alignment and trimming: align_and_trim.sh
+4. Find best model with IQtree_modelfind.sh
+5. Generate tree with IQtree.sh
+6. Run RenameTrees.py to get tip labels
