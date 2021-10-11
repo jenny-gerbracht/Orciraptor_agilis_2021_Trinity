@@ -4,6 +4,14 @@
 #$ -cwd
 #$ -pe threaded 10
 
+###################################################################
+#Script Name	:IQtree.sh		                                                                                              
+#Description	:Construct phylogenetic tree with IQtree                                                                              
+#Args:                                                                                           
+#Author	:Jennifer Gerbracht                                               
+#Email		:jennifer.gerbracht@gmx.de                                           
+###################################################################
+
 source activate iqtree
 
 iqtree \
