@@ -5,6 +5,7 @@ Read processing and filtering, *de novo* transcriptome assembly, differential ge
 
 1. Run readprocessing_and_assembly.sh, output is *de novo* transcriptome assembly of *Mougeotia* sp.
 2. Predict ORFs to use later for decontamination: transdecoder.sh
+3. Filter transcriptome for contigs smaller than 200 nt: seqkit_length.sh (only for upload)
 
 ## Module 2: Read processing of *Orciraptor agilis*
 
