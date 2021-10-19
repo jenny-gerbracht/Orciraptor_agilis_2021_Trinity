@@ -1,5 +1,5 @@
 ###################################################################
-#Script Name	:ParseORFsVSORFsblastp.py		                                                                                              
+#Script Name	:Extract_seq_using_FASTA.py		                                                                                              
 #Description	:Take a fasta file and extract these sequences from another fasta file.                                                                          
 #Args		:fasta file with headers of interest, fasta file with sequences to be
 # 		 extracted and name of output file
