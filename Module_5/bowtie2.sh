@@ -115,7 +115,7 @@ for i in "${samples[@]}"; do
   -x ${moduledir}/BAM/Orciraptor_non-redundant.fas \
   -1 ${readdir}/blacklist_NA_paired_unaligned_${i}.1.fq.gz \
   -2 ${readdir}/blacklist_NA_paired_unaligned_${i}.2.fq.gz \
-  --met-file bowtie2_alignment-metrics.txt | samtools view -bS - > ${moduledir}/BAM/${i}.BAM ) 3>&1 1>&2 2>&3 | tee stderr.log 
+  --met-file bowtie2_alignment-metrics.txt | samtools view -bS - > ${moduledir}/BAM/${i}.BAM ) 3>&1 1>&2 2>&3 | tee -a stderr.log 
   
 done
 
