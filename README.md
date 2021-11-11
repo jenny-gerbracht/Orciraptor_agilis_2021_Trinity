@@ -18,13 +18,13 @@ Read processing and filtering, *de novo* transcriptome assembly (Trinity), diffe
 2. Run blastn search with this transcriptome (nt database v5 updated on 2021-03-10): blastn.sh
   * Checked contigs with > 95% identity over a length of minimum 100 nt, saved contig identifiers of all bacterial, viral, ribosomal and algal contigs in contaminants.txt
   * Remove these sequences from transcriptome with seqkit.sh
-4. ORF prediction with transdecoder.sh
-5. Use Change_Seqname_TransDecoder.py to change names of the transcdecoder output
-6. Perform a diamond blastp search with diamond.sh comparing all ORFs against each other
-7. Run ParseORFsVSORFsblastp.py on the diamond output and the renamed transcdecoder file to
+3. ORF prediction with transdecoder.sh
+4. Use Change_Seqname_TransDecoder.py to change names of the transcdecoder output
+5. Perform a diamond blastp search with diamond.sh comparing all ORFs against each other
+6. Run ParseORFsVSORFsblastp.py on the diamond output and the renamed transcdecoder file to
 obtain a non-redundant .pep file, rename output to "Orciraptor_non-redundant.faa"
-8. Use Change_Seqname_TransDecoder.py to change the names of the corresponding coding sequences
-9. Call Extract_seq_using_FASTA.py to obtain the coding sequences of the non-redundant .pep file
+7. Use Change_Seqname_TransDecoder.py to change the names of the corresponding coding sequences
+8. Call Extract_seq_using_FASTA.py to obtain the coding sequences of the non-redundant .pep file
 
 ## Module 4: Functional annotation
 1. Run eggnog-mapper in diamond and hmm mode: eggnog.sh. 
