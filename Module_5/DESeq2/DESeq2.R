@@ -1,3 +1,10 @@
+###################################################################
+#Script Name	:DESeq2.R		                                                                                              
+#Description	:Run Orciraptor agilis gene expression analysis and generate figures                                                       
+#Author	:Jennifer Gerbracht                                               
+#Email		:jennifer.gerbracht@gmx.de                                           
+###################################################################
+
 library(tximport)
 library(DESeq2)
 library(ggplot2)
@@ -110,6 +117,13 @@ as.data.frame(res_ad) %>%
 
 gene_expression %>% 
   dplyr::select(transcript, baseMean, V1S4_TPM, V1S5_TPM, V1S6_TPM, V1S7_TPM, V1S8_TPM, V1S9_TPM, V1S1_TPM, V1S2_TPM, V1S3_TPM, log2FoldChange_ag, padj_ag, log2FoldChange_dg, padj_dg, log2FoldChange_ad, padj_ad) -> gene_expression
+
+write.table(gene_expression,
+            file = paste0(mydir, "/Tables/gene_expression.txt"),
+            row.names = FALSE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
 ###################
 ###################
 ## PCA plot
@@ -163,7 +177,7 @@ dge_set_2 <- c(rownames(res_ag_diff_2),
              rownames(res_dg_diff_2))
 dge_set_2 <- unique(dge_set_2)
 
-#Generate z-score matrix for heatmaps
+# Generate z-score matrix for heatmaps
 vsd_matrix <- assay(vsd)
 vsd_matrix_dge <- vsd_matrix[dge_set,]
 heat <- t(scale(t(vsd_matrix)))
@@ -171,10 +185,10 @@ heat <- heat[dge_set,]
 
 # Clusters rows by Pearson correlation as distance method
 hc <- hclust(as.dist(1 - cor(t(as.matrix(vsd_matrix_dge)))))
-my_transcript_partition_assignments <- cutree(hc, h=80/100*max(hc$height))
+my_transcript_partition_assignments <- cutree(hc, h = 80/100*max(hc$height))
 
 # Visualise dendrogram with clusters
-clust.cutree <- dendextend:::cutree(as.dendrogram(hc), h=80/100*max(hc$height), order_clusters_as_data = FALSE)
+clust.cutree <- dendextend:::cutree(as.dendrogram(hc), h = 80/100*max(hc$height), order_clusters_as_data = FALSE)
 idx <- order(names(clust.cutree))
 clust.cutree <- clust.cutree[idx]
 df.merge <- merge(my_transcript_partition_assignments, clust.cutree, by = "row.names")
@@ -252,7 +266,7 @@ dev.off()
 ## Needs blast2go.annot file 
 ## Needs transcript lengths obtained from Trinity scripts fasta_seq_length.pl
 
-#Import transcript <-> GO mapping
+# Import transcript <-> GO mapping
 blast2go <- read.delim(file = paste0(mydir, "/Module_5/GO_analysis/blast2go.annot"),
                        header = FALSE,
                        sep = "\t",
@@ -317,14 +331,14 @@ for (i in clusters) {
   cluster_results[[i]] <- filter(results_df, pvalue < 0.05)
 }
 
-#Check for GO numbers that have no description
+# Check for GO numbers that have no description
 cluster_results[[1]][is.na(cluster_results[[1]]$Description),]
 cluster_results[[2]][is.na(cluster_results[[2]]$Description),]
 cluster_results[[3]][is.na(cluster_results[[3]]$Description),]
 cluster_results[[4]][is.na(cluster_results[[4]]$Description),]
 cluster_results[[5]][is.na(cluster_results[[5]]$Description),]
 
-#Fill in missing Info for Description and Ontology
+# Fill in missing info for Description and Ontology
 cluster_results[[1]][3,2] <- c("protein-L-histidine N-pros-methyltransferase activity")
 cluster_results[[1]][3,9] <- c("MF")
 
@@ -434,19 +448,19 @@ dev.off()
 
 filter(cluster_results[[4]], p.adjust < 0.05)$Description
 
-#Plot cluster 2 extra
+# Plot cluster 2 extra
 pdf(file = paste0(mydir, "/Figures/cluster_lolipop_cluster2.pdf"), width = 6, height = 7)
 grid::grid.newpage()
 grid::grid.draw(cluster_lolipop[[2]])
 dev.off()
 
-#Plot cluster 4 extra
+# Plot cluster 4 extra
 pdf(file = paste0(mydir, "/Figures/cluster_lolipop_cluster4.pdf"), width = 6, height = 9)
 grid::grid.newpage()
 grid::grid.draw(cluster_lolipop[[4]])
 dev.off()
 
-# retrieve any GO terms significantly enriched and their ontology
+# Retrieve any GO terms significantly enriched and their ontology
 sig_GOs <- rbind(filter(cluster_results[[1]], p.adjust < 0.05),
                  filter(cluster_results[[2]], p.adjust < 0.05),
                  filter(cluster_results[[3]], p.adjust < 0.05),
@@ -541,13 +555,21 @@ eggnog_hmm$source <- c("hmm")
 
 # Keep all annotations from Diamond, add annotations for peptide sequences that were annotated only in HMM mode
 eggnog_combined <- rbind(eggnog_diamond, (eggnog_hmm[!eggnog_hmm$X.query_name %in% eggnog_diamond$X.query_name,]))
+
+# Write merged output
+write.table(eggnog_combined,
+            file = paste0(mydir, "/Module_4/eggnog/eggnog_merged.tsv"),
+            col.names = TRUE,
+            row.names = FALSE,
+            quote = FALSE,
+            sep = "\t")
+
 eggnog_combined %>% 
   filter(narr_og_cat != "-")  %>% 
   dplyr::select(X.query_name, Preferred_name, narr_og_cat, narr_og_desc) %>% 
   rename(., transcript = X.query_name) -> eggnog_combined_select
 eggnog_combined_select$transcript <- str_split(eggnog_combined_select$transcript, "_", simplify = TRUE)[,1]
 eggnog_z <- filter(eggnog_combined_select, str_detect(narr_og_cat, "Z"))
-
 
 heat %>% 
   as.data.frame() %>% 
@@ -567,7 +589,7 @@ write.table(heat_eggnog_go,
             sep = "\t",
             quote = FALSE)
 
-#automatically annotated heatmap
+# Automatically annotated heatmap
 pdf(file = paste0(mydir, "/Figures/cyto_heatmap_order_redcyan_genes.pdf"), width = 15, height = 18)
 draw(Heatmap(as.matrix(heat_eggnog_go), 
              name = "mean z-score", 
@@ -594,6 +616,17 @@ rownames(heat_eggnog_go) <- NULL
 filter(heat_eggnog_go, Category != "Non-cytoskeleton") %>%
   arrange(Category) -> cyto_heat
 
+
+heat_eggnog_go_anno %>% 
+  filter(Category == "Microtubule-related") %>% 
+  dplyr::select(3:12) -> test
+rownames(test) <- filter(heat_eggnog_go_anno, Category == "Microtubule-related")$V1S4
+test$V1S4 <- NULL
+colnames(test) <- c(4,5,6,7,8,9,1,2,3)
+pdf(file = "cyto_heatmap_test.pdf", width = 20, height = 20)
+pheatmap(as.matrix(test))
+dev.off()
+
 pdf(file = paste0(mydir, "/Figures/cyto_heatmap_order_redcyan.pdf"), width = 10, height = 15)
 draw(Heatmap(as.matrix(cyto_heat[,-c(10,11)]), 
              name = "mean z-score",
@@ -605,8 +638,10 @@ draw(Heatmap(as.matrix(cyto_heat[,-c(10,11)]),
              show_row_dend = FALSE,
              row_title_rot = 0,
              column_split = rep(1:3, each = 3),
-             row_split = c(rep("A", 26), rep("B", 2), rep("C", 35), rep("D", 9)),
-             row_title = c("Actin-related", "Cell division", "Microtubule-related", "Regulatory (Cell cycle)"),
+             row_split = c(rep("A", 6), rep("B", 6), rep("C", 2), rep("D", 1), rep("E", 28), rep("F", 3),
+                           rep("G", 14), rep("H", 9), rep("I", 2)),
+             row_title = c("Actin", "Actin-related", "Cell division", "Dynein",
+                           "Kinesin", "Microtubule-related", "Myosin", "Regulatory (Cell cycle)", "Tubulin"),
              bottom_annotation = HeatmapAnnotation(foo = anno_block(labels = c("Gliding", "Attacking", "Digesting"))),
              col = colorRamp2(c(-1.5,-0.75,0,0.75,1.5), colorRampPalette(c("cyan", "black", "red"))(5)),
              heatmap_legend_param = list(at = c(-1.5,-0.75,0,0.75,1.5))),
@@ -625,7 +660,6 @@ peptide_ids <- attr(transdecoder, "names")
 rm(transdecoder)
 
 # Obtain sequence identifiers from diamond blast vs SP
-
 diamond_SP <- read.delim(file = paste0(mydir, "/Module_4/diamond/diamond_SP.txt"), header = FALSE)
 diamond_SP_ids <- diamond_SP$V1
 rm(diamond_SP)
@@ -728,6 +762,13 @@ dotplot_data %>%
   ungroup() %>% 
   arrange(-attacking_TPM) -> attacking_TPM_df
 
+write.table(attacking_TPM_df[c(1:50),c(1:2)],
+            file = paste0(mydir, "/Tables/chitin_TPM.txt"),
+            row.names = FALSE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
+
 # Plot the top 50 in decreasing order
 
 #pdf(file = paste0(mydir, "/Figures/CBM_TPM.pdf"), height = 12, width = 3.5)
@@ -764,6 +805,13 @@ dotplot_data %>%
   filter(HMM %in% cleaving_families) %>% 
   arrange(-attacking_TPM) -> attacking_TPM_df
 
+write.table(attacking_TPM_df[c(1:50),c(1:2)],
+            file = paste0(mydir, "/Tables/lytic_TPM.txt"),
+            row.names = FALSE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
+
 # Plot the top 50 in decreasing order
 
 #pdf(file = paste0(mydir, "/Figures/Lytic_TPM.pdf"), height = 12, width = 3.5)
@@ -791,6 +839,13 @@ cleaving_families <- AA_families_ranked$HMM
 dotplot_data %>% 
   filter(HMM %in% AA_families_ranked) %>% 
   arrange(-attacking_TPM) -> attacking_TPM_df
+
+write.table(attacking_TPM_df[c(1:50),c(1:2)],
+            file = paste0(mydir, "/Tables/AA11_TPM.txt"),
+            row.names = FALSE,
+            col.names = TRUE,
+            quote = FALSE,
+            sep = "\t")
 
 # Plot the top 3 in decreasing order
 
@@ -845,8 +900,11 @@ GH5_5_counts$condition <- factor(c(rep("gliding", 3),
 set.seed(10)
 pdf(file = paste0(mydir, "/Figures/GH5_5_counts.pdf"), height = 5)
 ggplot(GH5_5_counts, aes(x = condition, y = log2(GH5_5_counts))) +
-  geom_jitter(aes(color = condition),
-              width = 0.2,
+  geom_boxplot(width = 0.5) +
+  stat_boxplot(geom = "errorbar",
+               width = 0.3,
+               linetype = "dashed") +
+  geom_point(aes(color = condition),
               size = 4) +
   scale_color_manual(values=c("#3333CC", "#D60093", "#1F4E79")) +
   theme_bw()
