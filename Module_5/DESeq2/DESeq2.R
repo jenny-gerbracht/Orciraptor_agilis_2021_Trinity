@@ -616,17 +616,6 @@ rownames(heat_eggnog_go) <- NULL
 filter(heat_eggnog_go, Category != "Non-cytoskeleton") %>%
   arrange(Category) -> cyto_heat
 
-
-heat_eggnog_go_anno %>% 
-  filter(Category == "Microtubule-related") %>% 
-  dplyr::select(3:12) -> test
-rownames(test) <- filter(heat_eggnog_go_anno, Category == "Microtubule-related")$V1S4
-test$V1S4 <- NULL
-colnames(test) <- c(4,5,6,7,8,9,1,2,3)
-pdf(file = "cyto_heatmap_test.pdf", width = 20, height = 20)
-pheatmap(as.matrix(test))
-dev.off()
-
 pdf(file = paste0(mydir, "/Figures/cyto_heatmap_order_redcyan.pdf"), width = 10, height = 15)
 draw(Heatmap(as.matrix(cyto_heat[,-c(10,11)]), 
              name = "mean z-score",
